@@ -51,6 +51,7 @@ class ProxmoxConfigRepository extends ProxmoxRepository
         Assert::isInstanceOf($this->server, Server::class);
 
         $response = $this->getHttpClient()
+            ->asForm()
             ->withUrlParameters([
                 'node' => $this->node->cluster,
                 'server' => $this->server->vmid,

@@ -44,6 +44,11 @@ class ServerCreationService
 
         $nodeId = Arr::get($data, 'node_id');
 
+        // Normalize vm_vlan to null if empty or 0
+        if (array_key_exists('vm_vlan', $data) && (empty($data['vm_vlan']) || $data['vm_vlan'] === 0)) {
+            $data['vm_vlan'] = null;
+        }
+
         $server = Server::create([
             'uuid' => $uuid,
             'uuid_short' => substr($uuid, 0, 8),
@@ -61,6 +66,10 @@ class ServerCreationService
             'backup_limit' => Arr::get($data, 'limits.backups'),
             'bandwidth_limit' => Arr::get($data, 'limits.bandwidth'),
         ]);
+
+        // Ensure vm_vlan is set to the effective value (server-specific or node default)
+        $server->vm_vlan = $server->vm_vlan ?? $server->node->vm_vlan;
+        $server->save();
 
         $server->refresh();
 
