@@ -53,6 +53,7 @@ class ServerCreationService
             'node_id' => $nodeId,
             'vmid' => Arr::get($data, 'vmid') ?? $this->generateUniqueVmId($nodeId),
             'hostname' => Arr::get($data, 'hostname'),
+            'vm_vlan' => Arr::get($data, 'vm_vlan'),
             'cpu' => Arr::get($data, 'limits.cpu'),
             'memory' => Arr::get($data, 'limits.memory'),
             'disk' => Arr::get($data, 'limits.disk'),

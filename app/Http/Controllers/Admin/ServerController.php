@@ -86,6 +86,8 @@ class ServerController extends ApiController
 
     public function update(UpdateGeneralInfoRequest $request, Server $server)
     {
+        $originalVlan = $server->vm_vlan;
+
         $this->connection->transaction(function () use ($request, $server) {
             if ($request->hostname !== $server->hostname && !empty($request->hostname)) {
                 try {
@@ -99,6 +101,17 @@ class ServerController extends ApiController
 
             $server->update($request->validated());
         });
+
+        // If VLAN was changed, sync the settings to Proxmox
+        if ($originalVlan !== $server->vm_vlan) {
+            try {
+                $this->networkService->syncSettings($server);
+            } catch (ProxmoxConnectionException) {
+                throw new ServiceUnavailableHttpException(
+                    message: "Server {$server->uuid} failed to sync VLAN settings.",
+                );
+            }
+        }
 
         $server->load(['addresses', 'user', 'node']);
 

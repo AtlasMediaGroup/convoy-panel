@@ -5,6 +5,7 @@ interface UpdateServerBuildParameters {
     cpu: number
     memory: number
     disk: number
+    vmVlan?: number | null
     addressIds: number[]
     snapshotLimit: number | null
     backupLimit: number | null
@@ -20,6 +21,7 @@ const updateBuild = async (
         backupLimit,
         bandwidthLimit,
         bandwidthUsage,
+        vmVlan,
         ...params
     }: UpdateServerBuildParameters
 ) => {
@@ -31,6 +33,7 @@ const updateBuild = async (
         backup_limit: backupLimit,
         bandwidth_limit: bandwidthLimit,
         bandwidth_usage: bandwidthUsage,
+        ...(vmVlan !== undefined ? { vm_vlan: vmVlan } : {}),
         ...params,
     })
 

@@ -32,6 +32,7 @@ const createServer = async ({
     shouldCreateServer,
     templateUuid,
     startOnCompletion,
+    vmVlan,
     limits: { addressIds, ...limits },
     ...params
 }: CreateServerParameters) => {
@@ -41,6 +42,7 @@ const createServer = async ({
         node_id: nodeId,
         user_id: userId,
         ...params,
+        vm_vlan: vmVlan,
         limits: {
             ...limits,
             address_ids: addressIds,

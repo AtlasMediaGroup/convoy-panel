@@ -19,6 +19,7 @@ class UpdateBuildRequest extends BaseApiRequest
             'cpu' => $rules['cpu'],
             'memory' => $rules['memory'],
             'disk' => $rules['disk'],
+            'vm_vlan' => $rules['vm_vlan'],
             'address_ids' => 'present|nullable|array',
             'address_ids.*' => 'integer|exists:ip_addresses,id',
             'snapshot_limit' => $rules['snapshot_limit'],
