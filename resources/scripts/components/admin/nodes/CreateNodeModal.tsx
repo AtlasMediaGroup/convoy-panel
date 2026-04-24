@@ -47,6 +47,10 @@ const CreateNodeModal = ({ open, onClose }: Props) => {
         backupStorage: z.string().min(1).max(191),
         isoStorage: z.string().min(1).max(191),
         network: z.string().min(1).max(191),
+        vmVlan: z.union([
+            z.literal(''),
+            z.preprocess(Number, z.number().int().min(1).max(4094)),
+        ]),
     })
 
     const form = useForm({
@@ -68,6 +72,7 @@ const CreateNodeModal = ({ open, onClose }: Props) => {
             backupStorage: '',
             isoStorage: '',
             network: '',
+            vmVlan: '',
         },
     })
 
@@ -78,12 +83,13 @@ const CreateNodeModal = ({ open, onClose }: Props) => {
     }
 
     const submit = async (_data: any) => {
-        const { memory, disk, ...data } = _data as z.infer<typeof schema>
+        const { memory, disk, vmVlan, ...data } = _data as z.infer<typeof schema>
         clearFlashes()
         try {
             const node = await createNode({
                 memory: memory * 1048576,
                 disk: disk * 1048576,
+                vmVlan: vmVlan === '' ? null : vmVlan,
                 ...data,
             })
 
@@ -183,6 +189,11 @@ const CreateNodeModal = ({ open, onClose }: Props) => {
                             name='network'
                             label={tStrings('network')}
                             placeholder='vmbr0'
+                        />
+                        <TextInputForm
+                            name='vmVlan'
+                            label='VM VLAN'
+                            placeholder='Leave blank for no VLAN'
                         />
                     </Modal.Body>
                     <Modal.Actions>

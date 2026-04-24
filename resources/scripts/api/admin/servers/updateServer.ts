@@ -6,18 +6,20 @@ interface UpdateServerParameters {
     name?: string | null
     hostname?: string | null
     vmid?: number | null
+    vmVlan?: number | null
     userId?: number | null
     status?: EloquentStatus
 }
 
 const updateServer = async (
     serverUuid: string,
-    { userId, ...params }: UpdateServerParameters
+    { userId, vmVlan, ...params }: UpdateServerParameters
 ) => {
     const {
         data: { data },
     } = await http.patch(`/api/admin/servers/${serverUuid}`, {
         user_id: userId,
+        ...(vmVlan !== undefined ? { vm_vlan: vmVlan } : {}),
         ...params,
     })
 

@@ -18,6 +18,7 @@ interface UpdateNodeParameters {
     backupStorage: string
     isoStorage: string
     network: string
+    vmVlan?: number | null
 }
 
 const updateNode = async (nodeId: number, payload: UpdateNodeParameters) => {
@@ -40,6 +41,7 @@ const updateNode = async (nodeId: number, payload: UpdateNodeParameters) => {
         backup_storage: payload.backupStorage,
         iso_storage: payload.isoStorage,
         network: payload.network,
+        vm_vlan: payload.vmVlan,
     })
 
     return rawDataToNode(data)

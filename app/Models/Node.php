@@ -28,6 +28,7 @@ class Node extends Model
         'verify_tls' => 'boolean',
         'memory' => MebibytesToAndFromBytes::class,
         'disk' => MebibytesToAndFromBytes::class,
+        'vm_vlan' => 'integer',
         'secret' => 'encrypted',
     ];
 
@@ -53,6 +54,7 @@ class Node extends Model
         'backup_storage' => ['required', 'string', 'max:191', 'regex:/^\S*$/u'],
         'iso_storage' => ['required', 'string', 'max:191', 'regex:/^\S*$/u'],
         'network' => ['required', 'string', 'max:191', 'regex:/^\S*$/u'],
+        'vm_vlan' => ['sometimes', 'nullable', 'integer', 'between:1,4094'],
         'coterm_id' => 'sometimes|nullable|integer|exists:coterms,id',
     ];
 

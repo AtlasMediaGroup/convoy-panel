@@ -52,6 +52,10 @@ const CreateServerModal = ({ nodeId, userId, open, onClose }: Props) => {
             z.literal(''),
         ]),
         hostname: hostname().max(191).nonempty(),
+        vmVlan: z.union([
+            z.literal(''),
+            z.preprocess(Number, z.number().int().min(1).max(4094)),
+        ]),
         addressIds: z.array(z.preprocess(Number, z.number())),
         cpu: z.preprocess(Number, z.number().min(1)),
         memory: z.preprocess(Number, z.number().min(16)),
@@ -83,6 +87,10 @@ const CreateServerModal = ({ nodeId, userId, open, onClose }: Props) => {
             z.literal(''),
         ]),
         hostname: hostname().max(191).nonempty(),
+        vmVlan: z.union([
+            z.literal(''),
+            z.preprocess(Number, z.number().int().min(1).max(4094)),
+        ]),
         addressIds: z.array(z.preprocess(Number, z.number())),
         cpu: z.preprocess(Number, z.number().min(1)),
         memory: z.preprocess(Number, z.number().min(16)),
@@ -126,6 +134,7 @@ const CreateServerModal = ({ nodeId, userId, open, onClose }: Props) => {
             backupLimit: '',
             bandwidthLimit: '',
             accountPassword: '',
+            vmVlan: '',
             shouldCreateServer: true,
             startOnCompletion: false,
             templateUuid: '',
@@ -138,6 +147,7 @@ const CreateServerModal = ({ nodeId, userId, open, onClose }: Props) => {
     const submit = async (_data: any) => {
         const {
             vmid,
+            vmVlan,
             cpu,
             memory,
             disk,
@@ -153,6 +163,7 @@ const CreateServerModal = ({ nodeId, userId, open, onClose }: Props) => {
             const server = await createServer({
                 ...data,
                 vmid: vmid !== '' ? vmid : null,
+                vmVlan: vmVlan === '' ? null : vmVlan,
                 limits: {
                     cpu,
                     memory: memory * 1048576,
@@ -217,6 +228,11 @@ const CreateServerModal = ({ nodeId, userId, open, onClose }: Props) => {
                         <TextInputForm
                             name={'hostname'}
                             label={tStrings('hostname')}
+                        />
+                        <TextInputForm
+                            name={'vmVlan'}
+                            label='VM VLAN'
+                            placeholder='Leave blank for no VLAN'
                         />
                         <AddressesMultiSelectForm
                             disabled={watchNodeId === ''}

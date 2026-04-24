@@ -34,6 +34,10 @@ const ServerInformationCard = () => {
         name: z.string().max(60).min(1),
         hostname: hostname().max(191).min(1),
         vmid: z.preprocess(Number, z.number().min(100).max(999999999)),
+        vmVlan: z.union([
+            z.literal(''),
+            z.preprocess(Number, z.number().int().min(1).max(4094)),
+        ]),
         userId: z.preprocess(Number, z.number()),
         status: z.string(),
     })
@@ -44,24 +48,27 @@ const ServerInformationCard = () => {
             name: server.name,
             hostname: server.hostname,
             vmid: server.vmid,
+            vmVlan: server.vmVlan?.toString() ?? '',
             userId: server.userId.toString(),
             status: server.status ?? 'ready',
         },
     })
 
     const submit = async (_data: any) => {
-        const { status, ...data } = _data as z.infer<typeof schema>
+        const { status, vmVlan, ...data } = _data as z.infer<typeof schema>
 
         clearFlashes()
         try {
             await updateServer(server.uuid, {
                 status: status === 'ready' ? null : (status as EloquentStatus),
+                vmVlan: vmVlan === '' ? null : vmVlan,
                 ...data,
             })
 
             setServer({
                 ...server,
                 status: status === 'ready' ? null : (status as EloquentStatus),
+                vmVlan: vmVlan === '' ? null : vmVlan,
                 ...data,
             })
 
@@ -69,6 +76,7 @@ const ServerInformationCard = () => {
                 name: data.name,
                 hostname: data.hostname,
                 vmid: data.vmid,
+                vmVlan: vmVlan === '' ? '' : vmVlan.toString(),
                 userId: data.userId.toString(),
                 status: status ?? 'ready',
             })
@@ -116,6 +124,11 @@ const ServerInformationCard = () => {
                                 label={tStrings('hostname')}
                             />
                             <TextInputForm name='vmid' label='VMID' />
+                            <TextInputForm
+                                name='vmVlan'
+                                label='VM VLAN'
+                                placeholder='Leave blank for no VLAN'
+                            />
                             <UsersSelectForm />
                             <SelectForm
                                 name={'status'}

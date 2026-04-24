@@ -9,6 +9,7 @@ export interface AdminServerBuild extends BaseServerBuild {
     userId: number
     nodeId: number
     vmid: number
+    vmVlan?: number | null
 }
 
 export const rawDataToAdminServer = (data: any): AdminServerBuild => ({
@@ -16,6 +17,7 @@ export const rawDataToAdminServer = (data: any): AdminServerBuild => ({
     userId: data.user_id,
     nodeId: data.node_id,
     vmid: data.vmid,
+    vmVlan: data.vm_vlan ?? null,
 })
 
 export const getServer = async (

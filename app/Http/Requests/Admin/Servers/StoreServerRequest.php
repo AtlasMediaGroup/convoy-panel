@@ -26,6 +26,7 @@ class StoreServerRequest extends BaseApiRequest
             // TODO: validation should be added for manually setting the vmid
             'vmid' => 'present|nullable|numeric|min:100|max:999999999',
             'hostname' => $rules['hostname'],
+            'vm_vlan' => $rules['vm_vlan'],
             'limits' => 'required|array',
             'limits.cpu' => $rules['cpu'],
             'limits.memory' => $rules['memory'],

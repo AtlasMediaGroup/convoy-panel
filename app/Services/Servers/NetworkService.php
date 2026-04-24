@@ -125,9 +125,20 @@ class NetworkService
         ]);
 
         $macAddress = $macAddresses->eloquent ?? $macAddresses->proxmox;
+        $defaultVlan = $server->vm_vlan ?? $server->node->vm_vlan;
+
+        $configuration = [
+            "virtio={$macAddress}",
+            "bridge={$server->node->network}",
+            'firewall=1',
+        ];
+
+        if ($defaultVlan !== null) {
+            $configuration[] = "tag={$defaultVlan}";
+        }
 
         $this->allocationRepository->setServer($server)->update(
-            ['net0' => "virtio={$macAddress},bridge={$server->node->network},firewall=1"],
+            ['net0' => implode(',', $configuration)],
         );
     }
 
@@ -190,6 +201,22 @@ class NetworkService
             $parsedConfig[] = (object) ['key' => 'firewall', 'value' => 1];
         }
 
+        $defaultVlan = $server->vm_vlan ?? $server->node->vm_vlan;
+
+        // Update or create the tag value from the server-specific or node default VLAN
+        $tagFound = false;
+        foreach ($parsedConfig as $item) {
+            if ($item->key === 'tag') {
+                $item->value = $defaultVlan;
+                $tagFound = true;
+                break;
+            }
+        }
+
+        if (!$tagFound && $defaultVlan !== null) {
+            $parsedConfig[] = (object) ['key' => 'tag', 'value' => $defaultVlan];
+        }
+
         // Handle the rate limit
         if (is_null($mebibytes)) {
             // Remove the 'rate' key if $mebibytes is null
@@ -210,6 +237,9 @@ class NetworkService
             }
         }
 
+        // Remove any empty tag entries created by node VLAN removal
+        $parsedConfig = array_filter($parsedConfig, fn ($item) => !($item->key === 'tag' && $item->value === null));
+
         // Rebuild the configuration string
         $newConfig = implode(',', array_map(fn ($item) => "{$item->key}={$item->value}", $parsedConfig));
 
@@ -227,7 +257,7 @@ class NetworkService
 
         foreach ($components as $component) {
             // Split each component into key and value
-            [$key, $value] = explode('=', $component);
+            [$key, $value] = explode('=', $component, 2);
 
             // Create an associative array (or object) for key-value pairs
             $parsedObjects[] = (object) ['key' => $key, 'value' => $value];

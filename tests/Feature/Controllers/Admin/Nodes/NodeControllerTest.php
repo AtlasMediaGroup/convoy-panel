@@ -43,9 +43,11 @@ it('can create a node', function () {
         'backup_storage' => 'local-lvm',
         'iso_storage' => 'local-lvm',
         'network' => 'vmbr0',
+        'vm_vlan' => 100,
     ]);
 
     $response->assertOk();
+    $response->assertJsonPath('data.vm_vlan', 100);
 });
 
 it('can update a node', function () {
@@ -65,9 +67,11 @@ it('can update a node', function () {
         'backup_storage' => 'local-lvm',
         'iso_storage' => 'local-lvm',
         'network' => 'vmbr0',
+        'vm_vlan' => 100,
     ]);
 
     $response->assertOk();
+    $response->assertJsonPath('data.vm_vlan', 100);
 });
 
 it("can't downsize without over-allocating", function () {

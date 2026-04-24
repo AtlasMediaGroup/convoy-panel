@@ -18,6 +18,7 @@ export interface Node {
     backupStorage: string
     isoStorage: string
     network: string
+    vmVlan: number | null
     cotermId: number | null
     serversCount: number
 }
@@ -40,6 +41,7 @@ export const rawDataToNode = (data: any): Node => ({
     backupStorage: data.backup_storage,
     isoStorage: data.iso_storage,
     network: data.network,
+    vmVlan: data.vm_vlan ?? null,
     cotermId: data.coterm_id,
     serversCount: data.servers_count,
 })

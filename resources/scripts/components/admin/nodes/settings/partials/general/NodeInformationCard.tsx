@@ -43,6 +43,10 @@ const NodeInformationCard = () => {
         backupStorage: z.string().min(1).max(191),
         isoStorage: z.string().min(1).max(191),
         network: z.string().min(1).max(191),
+        vmVlan: z.union([
+            z.literal(''),
+            z.preprocess(Number, z.number().int().min(1).max(4094)),
+        ]),
     })
 
     const form = useForm({
@@ -64,15 +68,17 @@ const NodeInformationCard = () => {
             backupStorage: node.backupStorage,
             isoStorage: node.isoStorage,
             network: node.network,
+            vmVlan: node.vmVlan?.toString() ?? '',
         },
     })
 
     const submit = async (_data: any) => {
-        const { memory, disk, ...data } = _data as z.infer<typeof schema>
+        const { memory, disk, vmVlan, ...data } = _data as z.infer<typeof schema>
         clearFlashes()
         try {
             const updatedNode = await updateNode(node.id, {
                 ...data,
+                vmVlan: vmVlan === '' ? null : vmVlan,
                 memory: memory * 1048576,
                 disk: disk * 1048576,
             })
@@ -96,6 +102,7 @@ const NodeInformationCard = () => {
                 backupStorage: data.backupStorage,
                 isoStorage: data.isoStorage,
                 network: data.network,
+                vmVlan: vmVlan === '' ? '' : vmVlan.toString(),
             })
         } catch (error) {
             clearAndAddHttpError(error as Error)
@@ -197,6 +204,11 @@ const NodeInformationCard = () => {
                                 name='network'
                                 label={tStrings('network')}
                                 placeholder='vmbr0'
+                            />
+                            <TextInputForm
+                                name='vmVlan'
+                                label='VM VLAN'
+                                placeholder='Leave blank for no VLAN'
                             />
                         </div>
                     </FormCard.Body>

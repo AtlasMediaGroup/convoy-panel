@@ -17,6 +17,7 @@ class UpdateGeneralInfoRequest extends BaseApiRequest
             'hostname' => [...$rules['hostname'], ...[new Hostname]],
             'user_id' => $rules['user_id'],
             'vmid' => $rules['vmid'],
+            'vm_vlan' => $rules['vm_vlan'],
             'status' => $rules['status'],
         ]);
     }

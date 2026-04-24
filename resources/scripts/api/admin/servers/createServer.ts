@@ -17,6 +17,7 @@ interface CreateServerParameters {
     nodeId: number
     vmid: number | null
     hostname: string
+    vmVlan?: number | null
     limits: ServerLimits
     accountPassword: string | null
     shouldCreateServer: boolean

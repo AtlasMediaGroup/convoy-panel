@@ -18,6 +18,7 @@ interface CreateNodeParameters {
     backupStorage: string
     isoStorage: string
     network: string
+    vmVlan?: number | null
 }
 
 const createNode = async (data: CreateNodeParameters): Promise<Node> => {
@@ -40,6 +41,7 @@ const createNode = async (data: CreateNodeParameters): Promise<Node> => {
         backup_storage: data.backupStorage,
         iso_storage: data.isoStorage,
         network: data.network,
+        vm_vlan: data.vmVlan,
     })
 
     return rawDataToNode(responseData)
